@@ -7,6 +7,7 @@ import sys
 import urllib
 import requests
 import tweepy
+from .db import DBHelper
 
 
 def help_command():
@@ -17,11 +18,14 @@ def help_command():
         "/translate - Translate message from english to arabic\n" \
         "/calculate - Calculate a mathematical expression\n" \
         "/tweet - Tweet on our Twitter account\n" \
-        "/ocr_url - Extract text from image\n"
+        "/ocr_url - Extract text from image\n"\
+        "/stop - Stop using bot\n" \
+        "/start - Start using bot"
 
 
-def start_command():
+def start_command(db: DBHelper, user_id: int, updated: int, active: bool):
     """Returns start command message"""
+    db.set_user_status(user_id, updated, active)
     return "Welcome to TBot.\n" \
         "Usage:\n" \
         "/help - Show help message\n" \
@@ -29,7 +33,9 @@ def start_command():
         "/translate - Translate message from English to Arabic\n" \
         "/calculate - Calculate a mathematical expression\n" \
         "/tweet - Tweet on our Twitter account\n" \
-        "/ocr_url - Extract text from image\n"
+        "/ocr_url - Extract text from image\n" \
+        "/stop - Stop using bot\n" \
+        "/start - Start using bot"
 
 
 def calculate(expr):
@@ -61,11 +67,10 @@ def translate(message):
     response = requests.post(
         "https://translate.yandex.net/api/v1.5/tr.json/translate",
         params={"key": yandex_token, "text": message, "lang": "en-ar"})
-    jsdict = response.json()
-    if response.status_code == 200:
-        return jsdict.get("text")[0]  # get text list then get element 0 of it
-    else:
+    if response.status_code != 200:
         return "Error Happend, try again later."
+    jsdict = response.json()
+    return jsdict.get("text")[0]  # get text list then get element 0 of it
 
 
 def tweet(text):
@@ -96,12 +101,13 @@ def weather():
     """Returns weather in Zagazig, Egypt"""
     location_key = 127335  # Zagazig location key
     url = f"http://dataservice.accuweather.com/forecasts/v1/hourly/1hour/{location_key}"
-    parameters = {
-        "apikey": os.environ.get("ACCUWEATHER"),
-        "metric": True
-    }
+    parameters = {"apikey": os.environ.get("ACCUWEATHER"), "metric": True}
     data = requests.get(url, params=parameters).json()[0]
     temperature = data["Temperature"]["Value"]
     atm_status = data["IconPhrase"]
     location = "Zagazig, Egypt"
     return f"Weather is {atm_status} in {location}.\nAnd it currently feels like {temperature} °C"
+
+
+def stop(db: DBHelper, user_id: int, updated: int, active: bool):
+    db.set_user_status(user_id, updated, active)

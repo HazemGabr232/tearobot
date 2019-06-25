@@ -20,6 +20,23 @@ CREATE TABLE IF NOT EXISTS "User" (
 	"created"	INTEGER NOT NULL,
 	"updated"	INTEGER NOT NULL,
 	"last_command"	TEXT,
+	"chat_id"	INTEGER,
 	PRIMARY KEY("id")
+);
+CREATE TABLE IF NOT EXISTS "Schedule" (
+	"id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+	"time"	INTEGER NOT NULL,
+	"saturday"	TEXT,
+	"sunday"	TEXT,
+	"monday"	TEXT,
+	"tuesday"	TEXT,
+	"wednesday"	TEXT,
+	"thursday"	TEXT
+);
+CREATE TABLE IF NOT EXISTS "Announcement" (
+	"id"			INTEGER PRIMARY KEY AUTOINCREMENT,
+	"time"			INTEGER,
+	"description" 	TEXT,
+	"cancelled"		INTEGER
 );
 COMMIT;

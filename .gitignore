@@ -125,3 +125,5 @@ conf.yaml
 *.dev
 *.db
 
+bot.db.bk*
+bot.db.server
